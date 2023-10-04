@@ -78,7 +78,7 @@ public class PacienteController {
         }
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> excluir(
             @PathVariable String id
     ) {
