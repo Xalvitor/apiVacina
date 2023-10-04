@@ -16,17 +16,8 @@ public class PacienteService {
         return pacienteRepository.findAll();
     }
 
-    public Paciente obterPeloNomeESobrenome(String nome, String sobrenome) throws Exception {
-        Paciente paciente = pacienteRepository.findFirstByNomeAndSobrenome(nome, sobrenome);
+    public Paciente encontrarPaciente(String id) throws Exception {
 
-        if (paciente == null) {
-            throw new Exception("Paciente não encontrado!");
-        }
-
-        return paciente;
-    }
-
-    public Paciente obterPeloId(String id) throws Exception {
         Optional<Paciente> pacienteOptional = pacienteRepository.findById(id);
 
         if (pacienteOptional.isEmpty()) {
@@ -40,8 +31,8 @@ public class PacienteService {
         pacienteRepository.insert(paciente);
     }
 
-    public Paciente atualizar(String nome, String sobrenome, Paciente paciente) throws Exception {
-        Paciente pacienteAntigo = obterPeloNomeESobrenome(nome, sobrenome);
+    public Paciente atualizar(String id, Paciente paciente) throws Exception {
+        Paciente pacienteAntigo = encontrarPaciente(id);
 
         pacienteAntigo.setNome(paciente.getNome());
         pacienteAntigo.setSobrenome(paciente.getSobrenome());
@@ -55,8 +46,8 @@ public class PacienteService {
         return pacienteAntigo;
     }
 
-    public void deletar(String nome, String sobrenome) throws Exception {
-        Paciente paciente = obterPeloNomeESobrenome(nome, sobrenome);
+    public void deletar(String id) throws Exception {
+        Paciente paciente = encontrarPaciente(id);
 
         pacienteRepository.delete(paciente);
 

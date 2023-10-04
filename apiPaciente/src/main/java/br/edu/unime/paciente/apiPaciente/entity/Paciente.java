@@ -29,7 +29,7 @@ public class Paciente {
     private LocalDate dataDeNascimento;
     private String genero;
 
-    private List<Contato> contatos;
+    private List<String> contatos;
 
     private List<Endereco> enderecos;
 

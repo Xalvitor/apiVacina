@@ -28,40 +28,47 @@ public class PacienteController {
         return ResponseEntity.ok().body(pacienteService.obterTodos());
     }
     @GetMapping("/{id}")
-    public ResponseEntity<?> obterPeloID(@PathVariable String id) {
+    public ResponseEntity<?> encontrarPaciente(@PathVariable String id) {
         try{
-            Paciente paciente = pacienteService.obterPeloId(id);
+            Paciente paciente = pacienteService.encontrarPaciente(id);
 
             return ResponseEntity.ok().body(paciente);
+
         } catch (Exception e) {
+
             Map<String, String> resposta = new HashMap<>();
+
             resposta.put("mensagem", e.getMessage());
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
         }
 
     }
     @PostMapping
+
     public ResponseEntity<?> inserir(@RequestBody @Valid Paciente paciente, BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()){
+
             List<String> erros = bindingResult
                     .getAllErrors()
                     .stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .toList();
+
             return ResponseEntity.badRequest().body(erros.toArray());
         }
         pacienteService.inserir(paciente);
 
         return ResponseEntity.created(null).body(paciente);
     }
-    @PutMapping("/{nome}/{sobrenome}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(
-            @PathVariable String nome,
-            @PathVariable String sobrenome,
+            @PathVariable String id,
             @RequestBody Paciente paciente
     ) {
         try {
-            Paciente pacienteAtualizado = pacienteService.atualizar(nome, sobrenome, paciente);
+            Paciente pacienteAtualizado = pacienteService.atualizar(id, paciente);
 
             return ResponseEntity.ok().body(pacienteAtualizado);
         } catch (Exception e) {
@@ -71,13 +78,12 @@ public class PacienteController {
         }
     }
 
-    @DeleteMapping("/{nome}/{sobrenome}")
+    @DeleteMapping("/id")
     public ResponseEntity<?> excluir(
-            @PathVariable String nome,
-            @PathVariable String sobrenome
+            @PathVariable String id
     ) {
         try {
-            pacienteService.deletar(nome, sobrenome);
+            pacienteService.deletar(id);
 
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
