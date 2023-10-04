@@ -7,18 +7,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Endereco {
+public class Contato {
 
-    private String Logradouro;
+    private String celular;
 
-    private int Numero;
+    private String email;
 
-    private String Bairro;
+    private String whatsapp;
 
-    private String CEP;
-
-    private String Municipio;
-
-    private String Estado;
 
 }

@@ -47,6 +47,8 @@ public class PacienteService {
         pacienteAntigo.setSobrenome(paciente.getSobrenome());
         pacienteAntigo.setDataDeNascimento(paciente.getDataDeNascimento());
         pacienteAntigo.setGenero(paciente.getGenero());
+        pacienteAntigo.setContatos(paciente.getContatos());
+        pacienteAntigo.setEnderecos(paciente.getEnderecos());
 
         pacienteRepository.save(pacienteAntigo);
 
