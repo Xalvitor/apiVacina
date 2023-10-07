@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.edu.unime.paciente</groupId>
-	<artifactId>apiPaciente</artifactId>
+	<artifactId>apiVacina</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>apiPaciente</name>
 	<description>API de controle de pacientes Java</description>

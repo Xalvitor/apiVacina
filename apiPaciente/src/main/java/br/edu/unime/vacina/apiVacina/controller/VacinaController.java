@@ -1,7 +1,7 @@
-package br.edu.unime.paciente.apiPaciente.controller;
+package br.edu.unime.vacina.apiVacina.controller;
 
-import br.edu.unime.paciente.apiPaciente.entity.Paciente;
-import br.edu.unime.paciente.apiPaciente.service.PacienteService;
+import br.edu.unime.vacina.apiVacina.entity.Vacina;
+import br.edu.unime.vacina.apiVacina.service.VacinaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -18,19 +18,19 @@ import javax.validation.Valid;
 @Data
 
 @RestController
-@RequestMapping("/pacientes")
-public class PacienteController {
+@RequestMapping("/vacina")
+public class VacinaController {
 
     @Autowired
-    PacienteService pacienteService;
+    VacinaService vacinaService;
     @GetMapping
-    public ResponseEntity<List<Paciente>> obterTodos(){
-        return ResponseEntity.ok().body(pacienteService.obterTodos());
+    public ResponseEntity<List<Vacina>> obterTodos(){
+        return ResponseEntity.ok().body(vacinaService.obterTodos());
     }
     @GetMapping("/{id}")
     public ResponseEntity<?> encontrarPaciente(@PathVariable String id) {
         try{
-            Paciente paciente = pacienteService.encontrarPaciente(id);
+            Vacina paciente = vacinaService.encontrarVacina(id);
 
             return ResponseEntity.ok().body(paciente);
 
@@ -46,7 +46,7 @@ public class PacienteController {
     }
     @PostMapping
 
-    public ResponseEntity<?> inserir(@RequestBody @Valid Paciente paciente, BindingResult bindingResult) {
+    public ResponseEntity<?> inserir(@RequestBody @Valid Vacina vacina, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()){
 
@@ -58,19 +58,19 @@ public class PacienteController {
 
             return ResponseEntity.badRequest().body(erros.toArray());
         }
-        pacienteService.inserir(paciente);
+        vacinaService.inserir(vacina);
 
-        return ResponseEntity.created(null).body(paciente);
+        return ResponseEntity.created(null).body(vacina);
     }
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(
             @PathVariable String id,
-            @RequestBody Paciente paciente
+            @RequestBody Vacina vacina
     ) {
         try {
-            Paciente pacienteAtualizado = pacienteService.atualizar(id, paciente);
+            Vacina vacinaAtualizado = vacinaService.atualizar(id, vacina);
 
-            return ResponseEntity.ok().body(pacienteAtualizado);
+            return ResponseEntity.ok().body(vacinaAtualizado);
         } catch (Exception e) {
             Map<String, String> resposta = new HashMap<>();
             resposta.put("mensagem", e.getMessage());
@@ -83,7 +83,7 @@ public class PacienteController {
             @PathVariable String id
     ) {
         try {
-            pacienteService.deletar(id);
+            vacinaService.deletar(id);
 
             return ResponseEntity.noContent().build();
         } catch (Exception e) {

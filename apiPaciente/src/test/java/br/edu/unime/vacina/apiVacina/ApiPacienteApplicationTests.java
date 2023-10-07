@@ -1,10 +1,10 @@
-package br.edu.unime.paciente.apiPaciente;
+package br.edu.unime.vacina.apiVacina;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ApiPacienteApplicationTests {
+class piVacinaApplicationTests {
 
 	@Test
 	void contextLoads() {
