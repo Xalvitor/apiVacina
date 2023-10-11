@@ -1,4 +1,4 @@
-# apiPaciente
+# apiVacina
  Para esse projeto será necessário criar 3 APIs, cada uma rodando em portas separadas e com seu banco de dados isolado. 
 
 A **API 1 deve gerenciar Vacinas, sendo que uma vacina deve ter:**

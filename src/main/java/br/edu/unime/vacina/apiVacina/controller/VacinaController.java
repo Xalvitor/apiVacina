@@ -13,6 +13,7 @@ import java.util.*;
 
 import lombok.Data;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @Data
@@ -25,13 +26,16 @@ public class VacinaController {
     VacinaService vacinaService;
     @GetMapping
     public ResponseEntity<List<Vacina>> obterTodos(){
+        int statusCode = HttpServletResponse.SC_OK;
+        vacinaService.registrarLog("GET" , "Buscar Vacinas", vacinaService.obterTodos().toString(), statusCode);
         return ResponseEntity.ok().body(vacinaService.obterTodos());
     }
     @GetMapping("/{id}")
-    public ResponseEntity<?> encontrarPaciente(@PathVariable String id) {
+    public ResponseEntity<?> encontrarVacina(@PathVariable String id) {
         try{
             Vacina paciente = vacinaService.encontrarVacina(id);
-
+            int statusCode = HttpServletResponse.SC_OK;
+            vacinaService.registrarLog("GET" , "Buscar Vacina pelo id", id , statusCode);
             return ResponseEntity.ok().body(paciente);
 
         } catch (Exception e) {
@@ -39,6 +43,9 @@ public class VacinaController {
             Map<String, String> resposta = new HashMap<>();
 
             resposta.put("mensagem", e.getMessage());
+
+            int statusCode = HttpServletResponse.SC_NOT_FOUND;
+            vacinaService.registrarLog("GET" , "Buscar Vacina pelo id" ,"Erro ao buscar Vacina pelo id: "+id, statusCode);
 
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
         }
@@ -56,9 +63,15 @@ public class VacinaController {
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .toList();
 
+            int statusCode = HttpServletResponse.SC_BAD_GATEWAY;
+            vacinaService.registrarLog("POST" , "Erro ao adicionar Vacina", "Objeto: "+vacina , statusCode);
+
             return ResponseEntity.badRequest().body(erros.toArray());
         }
         vacinaService.inserir(vacina);
+
+        int statusCode = HttpServletResponse.SC_CREATED;
+        vacinaService.registrarLog("POST" , "Adicionar Vacina", "Objeto: "+vacina , statusCode);
 
         return ResponseEntity.created(null).body(vacina);
     }
@@ -70,10 +83,18 @@ public class VacinaController {
         try {
             Vacina vacinaAtualizado = vacinaService.atualizar(id, vacina);
 
+            int statusCode = HttpServletResponse.SC_OK;
+            vacinaService.registrarLog("PUT" , "Atualizar Vacina",vacina + " pelo id: "+ id , statusCode);
+
             return ResponseEntity.ok().body(vacinaAtualizado);
+
         } catch (Exception e) {
             Map<String, String> resposta = new HashMap<>();
             resposta.put("mensagem", e.getMessage());
+
+            int statusCode = HttpServletResponse.SC_NOT_FOUND;
+            vacinaService.registrarLog("PUT" , "Atualizar Vacina" ,"Erro ao atualizar Vacina" + vacina + " pelo id: "+ id, statusCode);
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
@@ -85,10 +106,17 @@ public class VacinaController {
         try {
             vacinaService.deletar(id);
 
+            int statusCode = HttpServletResponse.SC_NO_CONTENT;
+            vacinaService.registrarLog("DELETE" , "Deletar Vacina por id", "Id da vacina: "+id, statusCode);
+
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             Map<String, String> resposta = new HashMap<>();
             resposta.put("mensagem", e.getMessage());
+
+            int statusCode = HttpServletResponse.SC_NOT_FOUND;
+            vacinaService.registrarLog("DELETE" , "Erro ao deletar Vacina por id", "Id da vacina"+ id, statusCode);
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }

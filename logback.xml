@@ -1,0 +1,14 @@
+<configuration>
+    <appender name="mongodb" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>localhost:27017</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"application": "apiVacina"}</customFields>
+        </encoder>
+    </appender>
+
+    <logger name="com.example.vacinas" level="INFO" />
+
+    <root level="INFO">
+        <appender-ref ref="mongodb" />
+    </root>
+</configuration>
