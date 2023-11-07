@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,9 +62,7 @@ class VacinaControllerTest {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(VACINA_ID_PFIZER))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].fabricante").value("PFIZER"))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].lote").value("123ABC"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].dataDeValidade[0]").value(2025))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].dataDeValidade[1]").value(3))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].dataDeValidade[2]").value(23))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].dataDeValidade").value(String.valueOf(pfizer.getDataDeValidade())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].numeroDeDoses").value(2))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].intervaloDeDoses").value(21))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[1].id").value(VACINA_ID_CORONAVAC))
@@ -114,9 +111,7 @@ class VacinaControllerTest {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(VACINA_ID_PFIZER))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.fabricante").value("PFIZER"))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.lote").value("123ABC"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.dataDeValidade[0]").value(2024))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.dataDeValidade[1]").value(5))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.dataDeValidade[2]").value(11))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.dataDeValidade").value(String.valueOf(pfizer.getDataDeValidade())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.numeroDeDoses").value(2))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.intervaloDeDoses").value(21));
 
@@ -168,9 +163,7 @@ class VacinaControllerTest {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(novaVacina.getId()))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.fabricante").value(novaVacina.getFabricante()))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.lote").value(novaVacina.getLote()))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.dataDeValidade[0]").value(2023))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.dataDeValidade[1]").value(11))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.dataDeValidade[2]").value(2))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.dataDeValidade").value(String.valueOf(novaVacina.getDataDeValidade())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.numeroDeDoses").value(novaVacina.getNumeroDeDoses()))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.intervaloDeDoses").value(novaVacina.getIntervaloDeDoses()));
 
@@ -202,9 +195,7 @@ class VacinaControllerTest {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(vacinaAtualizada.getId()))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.fabricante").value(vacinaAtualizada.getFabricante()))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.lote").value(vacinaAtualizada.getLote()))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.dataDeValidade[0]").value(vacinaAtualizada.getDataDeValidade().getYear()))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.dataDeValidade[1]").value(vacinaAtualizada.getDataDeValidade().getMonthValue()))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.dataDeValidade[2]").value(vacinaAtualizada.getDataDeValidade().getDayOfMonth()))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.dataDeValidade").value(String.valueOf(vacinaAtualizada.getDataDeValidade())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.numeroDeDoses").value(vacinaAtualizada.getNumeroDeDoses()))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.intervaloDeDoses").value(vacinaAtualizada.getIntervaloDeDoses()));
 
@@ -228,5 +219,20 @@ class VacinaControllerTest {
 
 		// Verify
 		verify(vacinaService, times(1)).deletar(vacinaId);
+	}
+	@Test
+	@DisplayName("Deve retornar erro ao tentar deletar um paciente utilizando um ID que não consta no banco de dados. ")
+	public void testeDeletarVacinaComIdInvalido() throws Exception {
+
+		//Arrange
+		String vacinaId = "1010101010";
+
+		//Mock
+		doThrow(new ResourceNotFoundException("Vacina não encontrada")).when(vacinaService).deletar(vacinaId);
+
+		//Act & Assert
+		mockMvc.perform(MockMvcRequestBuilders.delete("/vacina/{id}", vacinaId)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isNotFound());
 	}
 }
