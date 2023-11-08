@@ -13,17 +13,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -172,6 +179,95 @@ class VacinaControllerTest {
 	}
 
 	@Test
+	@DisplayName("Deve retornar erro ao tentar inserir uma vacina no banco de dados com informações em branco.")
+	public void testeTentarInserirVacinaComInformacoesEmBranco() throws Exception {
+		// Arrange
+		Vacina vacina = new Vacina("12345", "", "", null, null, null);
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new JavaTimeModule());
+		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, false);
+		String vacinaJson = objectMapper.writeValueAsString(vacina);
+
+		// Act & Assert
+		mockMvc.perform(MockMvcRequestBuilders.post("/vacina")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(vacinaJson))
+				.andExpect(MockMvcResultMatchers.status().isBadRequest()) // Status esperado agora é BAD REQUEST (400)
+				.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.[*]").value(
+						containsInAnyOrder(
+								"Fabricante não pode estar em branco.",
+								"Lote não pode estar em branco!",
+								"O Fabricante deve ter entre 3 a 100 digitos",
+								"A data de validade deve ser inserida!",
+								"O número de doses deve ser inserida!",
+								"O Lote deve ter entre 3 a 100 digitos!"
+						)
+				));
+	}
+
+	@Test
+	@DisplayName("Deve retornar erro ao tentar cadastrar no banco de dados uma vacina com dados incompletos.")
+	public void testeAdicionarVacinaAoBancoDeDadosSemInformacao() throws Exception {
+		// Arrange
+		Vacina vacina = new Vacina();
+
+		// Mock
+		doNothing().when(vacinaService).inserir(any(Vacina.class));
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new JavaTimeModule());
+		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, false);
+		String vacinaJson = objectMapper.writeValueAsString(vacina);
+
+		// Act & Assert
+		mockMvc.perform(MockMvcRequestBuilders.post("/vacina")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(vacinaJson))
+				.andExpect(MockMvcResultMatchers.status().isBadRequest())
+				.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.[*]").value(
+						containsInAnyOrder(
+								"A data de validade deve ser inserida!",
+								"O número de doses deve ser inserida!",
+								"Lote não pode estar em branco!",
+								"Fabricante não pode estar em branco.",
+								"Fabricante não pode estar em nulo.",
+								"Lote não pode estar nulo!"
+						)
+				));
+	}
+
+	@Test
+	@DisplayName("Deve retornar erro ao tentar atualizar uma vacina no banco de dados com informações em branco.")
+	public void testeTentarAtualizarVacinaComInformacoesEmBranco() throws Exception {
+		// Arrange: Crie uma vacina no banco de dados
+		Vacina vacina = new Vacina("12345", "Nome do Fabricante", "Lote123", LocalDate.of(2023, 12, 31), 2, 21);
+
+		// Mock: Quando o serviço de vacina tentar atualizar a vacina, lance uma exceção de validação
+		doThrow(new DataIntegrityViolationException("Erro de validação.")).when(vacinaService).atualizar(eq(vacina.getId()), any(Vacina.class));
+
+		// Crie um objeto Vacina com informações em branco
+		Vacina vacinaEmBranco = new Vacina();
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		String vacinaJson = objectMapper.writeValueAsString(vacinaEmBranco);
+
+		// Act & Assert: Envie uma solicitação PUT para atualizar a vacina com informações em branco
+		mockMvc.perform(MockMvcRequestBuilders.put("/vacina/" + vacina.getId())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(vacinaJson))
+				.andExpect(MockMvcResultMatchers.status().isNotFound()) // Verifique o código de status
+				.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE)) // Verifique o tipo de conteúdo da resposta
+				.andExpect(MockMvcResultMatchers.jsonPath("$.mensagem").value("Erro de validação: Erro de validação.")); // Verifique a mensagem de erro
+
+		// Verify
+		verify(vacinaService, times(1)).atualizar(eq(vacina.getId()), any(Vacina.class));
+	}
+
+
+	@Test
 	@DisplayName("Deve atualizar uma vacina no banco de dados")
 	public void testAtualizarVacina() throws Exception {
 		// Arrange
@@ -202,6 +298,7 @@ class VacinaControllerTest {
 		// Verify
 		verify(vacinaService, times(1)).atualizar(eq(vacinaId), any(Vacina.class));
 	}
+
 
 
 	@Test

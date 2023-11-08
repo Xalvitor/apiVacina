@@ -4,6 +4,7 @@ import br.edu.unime.vacina.apiVacina.entity.Vacina;
 import br.edu.unime.vacina.apiVacina.service.VacinaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -84,20 +85,23 @@ public class VacinaController {
             Vacina vacinaAtualizado = vacinaService.atualizar(id, vacina);
 
             int statusCode = HttpServletResponse.SC_OK;
-            vacinaService.registrarLog("PUT" , "Atualizar Vacina",vacina + " pelo id: "+ id , statusCode);
+            vacinaService.registrarLog("PUT", "Atualizar Vacina", vacina + " pelo id: " + id, statusCode);
 
             return ResponseEntity.ok().body(vacinaAtualizado);
 
-        } catch (Exception e) {
+        } catch (DataIntegrityViolationException e) {
             Map<String, String> resposta = new HashMap<>();
-            resposta.put("mensagem", e.getMessage());
+            resposta.put("mensagem", "Erro de validação: " + e.getMessage());
 
             int statusCode = HttpServletResponse.SC_NOT_FOUND;
-            vacinaService.registrarLog("PUT" , "Atualizar Vacina" ,"Erro ao atualizar Vacina" + vacina + " pelo id: "+ id, statusCode);
+            vacinaService.registrarLog("PUT", "Atualizar Vacina", "Erro ao atualizar Vacina " + vacina + " pelo id: " + id, statusCode);
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluir(

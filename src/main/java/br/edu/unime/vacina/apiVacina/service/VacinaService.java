@@ -80,19 +80,37 @@ public class VacinaService {
 
     @CachePut(value = "vacinaCache", key = "#id")
     public Vacina atualizar(String id, Vacina vacina) throws Exception {
-
         Vacina vacinaAntigo = encontrarVacina(id);
 
-        vacinaAntigo.setFabricante(vacina.getFabricante());
-        vacinaAntigo.setLote(vacina.getLote());
-        vacinaAntigo.setIntervaloDeDoses(vacina.getIntervaloDeDoses());
-        vacinaAntigo.setDataDeValidade(vacina.getDataDeValidade());
-        vacinaAntigo.setNumeroDeDoses(vacina.getNumeroDeDoses());
+        if (vacina.getFabricante() != null) {
+            vacinaAntigo.setFabricante(vacina.getFabricante());
+        }
 
-        vacinaRepository.save(vacinaAntigo);
+        if (vacina.getLote() != null) {
+            vacinaAntigo.setLote(vacina.getLote());
+        }
+
+        if (vacina.getIntervaloDeDoses() != null) {
+            vacinaAntigo.setIntervaloDeDoses(vacina.getIntervaloDeDoses());
+        }
+
+        if (vacina.getDataDeValidade() != null) {
+            vacinaAntigo.setDataDeValidade(vacina.getDataDeValidade());
+        }
+
+        if (vacina.getNumeroDeDoses() != null) {
+            vacinaAntigo.setNumeroDeDoses(vacina.getNumeroDeDoses());
+        }
+
+        try {
+            vacinaRepository.save(vacinaAntigo);
+        } catch (Exception e) {
+            throw new Exception("Erro ao salvar a vacina: " + e.getMessage());
+        }
 
         return vacinaAntigo;
     }
+
 
     public void deletar(String id) throws Exception {
         Cache cache = cacheManager.getCache("vacinaCache");

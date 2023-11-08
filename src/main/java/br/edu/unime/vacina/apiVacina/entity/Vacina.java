@@ -19,10 +19,12 @@ public class Vacina {
     private String id;
 
     @NotBlank(message = "Fabricante não pode estar em branco.")
+    @NotNull(message = "Fabricante não pode estar em nulo.")
     @Size(min = 3, max = 100, message = "O Fabricante deve ter entre 3 a 100 digitos")
     private String fabricante;
 
     @NotBlank(message = "Lote não pode estar em branco!")
+    @NotNull(message = "Lote não pode estar nulo!")
     @Size(min = 3, max = 100, message = "O Lote deve ter entre 3 a 100 digitos!")
     private String lote;
 
