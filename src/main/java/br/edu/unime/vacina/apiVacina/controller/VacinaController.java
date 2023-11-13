@@ -1,5 +1,6 @@
 package br.edu.unime.vacina.apiVacina.controller;
 
+import br.edu.unime.vacina.apiVacina.cadastroVacinas.ListaVacinas;
 import br.edu.unime.vacina.apiVacina.entity.Vacina;
 import br.edu.unime.vacina.apiVacina.service.VacinaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,6 +124,33 @@ public class VacinaController {
 
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+
+    @PostMapping("/adicionar-vacinas")
+    public ResponseEntity<?> inserirVacinasPredefinidasAoBanco() {
+        try {
+            ListaVacinas pacientesPredefinidos = new ListaVacinas();
+
+            List<Vacina> pacientes = pacientesPredefinidos.CadastrarVacinasPredefinidas();
+
+            for (Vacina paciente : pacientes) {
+                vacinaService.inserir(paciente);
+                int statusCode = HttpServletResponse.SC_BAD_REQUEST;
+                vacinaService.registrarLog("POST", "Adicionar vacinas predefinidas", "Quantidade de vacinas adicionadas: " + pacientes.size(), statusCode);
+            }
+            return ResponseEntity.status(HttpStatus.CREATED).body("Vacinas inseridas");
+
+        } catch (Exception e) {
+
+            Map<String, String> resposta = new HashMap<>();
+            resposta.put("mensagem", e.getMessage());
+
+            int statusCode = HttpServletResponse.SC_BAD_REQUEST;
+            vacinaService.registrarLog("POST", "Adicionar vacinas predefinidas","Erro ao tentar adicionar vacinas predefinidas", statusCode);
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resposta);
+        }
+
     }
 
 }
