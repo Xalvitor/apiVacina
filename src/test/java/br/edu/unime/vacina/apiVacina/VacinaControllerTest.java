@@ -332,4 +332,18 @@ class VacinaControllerTest {
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isNotFound());
 	}
+
+	@Test
+	@DisplayName("Deve retornar erro ao de notFound caso tente acessar um endereço invalido ")
+	public void testeErroAoTentarAcessarLocalInvalido() throws Exception {
+
+
+		//Mock
+		doThrow(new ResourceNotFoundException("Endereço não encontrado")).when(vacinaService).encontrarVacina(anyString());
+
+		//Act & Assert
+		mockMvc.perform(MockMvcRequestBuilders.get("/vacinas")
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isNotFound());
+	}
 }

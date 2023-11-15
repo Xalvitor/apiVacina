@@ -1,4 +1,4 @@
-# API de Vacina
+# API de Vacinas
 
 Este é um projeto de API desenvolvido em Spring Boot para gerenciamento de informações sobre vacinas.
 
@@ -81,5 +81,9 @@ Acesse os seguintes endpoints da API:
 
 - `DELETE http://localhost:8081/vacina/{id}`: Deleta uma vacina do banco de dados com base no ID.
 - `POST http://localhost:8081/vacina/adicionar-vacinas`: Adiciona vacinas predefinidas ao banco de dados para fins de teste.
+
+## Licença MIT
+
+Este projeto é licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ---
