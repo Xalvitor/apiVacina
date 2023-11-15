@@ -54,15 +54,6 @@ public class VacinaService {
 
     @Cacheable("vacinaCache")
     public Vacina encontrarVacina(String id) throws Exception {
-        Cache cache = cacheManager.getCache("vacinaCache");
-
-        if (cache != null){
-            Cache.ValueWrapper valorBuscaId = cache.get(id);
-            if (valorBuscaId != null) {
-                Vacina vacina = (Vacina) valorBuscaId.get();
-                return vacina;
-            }
-        }
 
         Optional<Vacina> vacinaOptional = vacinaRepository.findById(id);
 
