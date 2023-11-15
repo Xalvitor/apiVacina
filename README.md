@@ -82,4 +82,8 @@ Acesse os seguintes endpoints da API:
 - `DELETE http://localhost:8081/vacina/{id}`: Deleta uma vacina do banco de dados com base no ID.
 - `POST http://localhost:8081/vacina/adicionar-vacinas`: Adiciona vacinas predefinidas ao banco de dados para fins de teste.
 
+## Licença
+
+Este projeto é licenciado sob a Licença MIT - veja o arquivo [LICENSE.md](LICENSE.md) para detalhes.
+
 ---
